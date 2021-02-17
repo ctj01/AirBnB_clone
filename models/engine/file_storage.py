@@ -7,11 +7,11 @@ from models.base_model import BaseModel
 import json
 
 
-class FileStorage(BaseModel):
+class FileStorage:
     """
     Filestorage implementation
     """
-    __file_path = "object.json"
+    __file_path = "file.json"
     __objects = {}
 
     def all(self):
@@ -26,22 +26,23 @@ class FileStorage(BaseModel):
         Args:
             obj ([type]): [description]
         """
-        self.__objects = obj[type(obj).__name__ + '.' + obj.id].id
+        type(self).__objects[type(obj).__name__ + '.' + obj.id] = obj
 
     def save(self):
         """
         serializes __objects to the JSON file (path: __file_path)
         """
-        a = dict()
-        for key, value in self.__objects.items():
-            a = dict(key, value)
-        with open(self.__file_path, "w", encoding="utf-8") as f:
+        a = {}
+        for key, value in FileStorage.__objects.items():
+            a[key] = value.to_dict()
+        with open(FileStorage.__file_path, "w", encoding="utf-8") as f:
             json.dump(a,f)
+
 
     def reload(self):
         """Deserializes the JSON file to __objects"""
         try:
-            with open(self.__file_path, "r",
+            with open(FileStorage.__file_path, "r",
                       encoding='utf-8') as read_file:
                 type(self).__objects = json.load(read_file)
             for key, value in type(self).__objects.items():
