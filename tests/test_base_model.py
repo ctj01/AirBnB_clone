@@ -10,104 +10,95 @@ import datetime
 
 
 class TestBaseModel(unittest.TestCase):
-    """test class for testing base models
-    """
+    '''
+    Test cases for base_model class
+    '''
+
     def setUp(self):
-        self.temp_b = BaseModel()
+        '''
+        simple set up
+        '''
+        self.new_instance = BaseModel()
 
-    def tearDown(self):
-        self.temp_b = None
+    def destroy(self):
+        '''
+        tear down method
+        '''
+        del self.new_instance
 
-    def test_type(self):
-        """test method for type testing of basemodel
-        """
-        self.assertIsInstance(self.temp_b, BaseModel)
-        self.assertEqual(type(self.temp_b), BaseModel)
+    def test_id_is_string(self):
+        '''
+        testing to verify id is a string
+        '''
+        self.assertEqual(str(type(self.new_instance.id)), "<class 'str'>")
 
-    def test_basic_attribute_set(self):
-        """test method for basic attribute assignment
-        """
-        self.temp_b.name = "bennett"
-        self.temp_b.xyz = 400
-        self.assertEqual(self.temp_b.name, "bennett")
-        self.assertEqual(self.temp_b.xyz, 400)
+    def test_created_at_is_datetimeobj(self):
+        '''
+        tests if created_at is a datetime object
+        '''
+        self.assertEqual(str(type(self.new_instance.created_at)),
+                         "<class 'datetime.datetime'>")
 
-    def test_string_return(self):
-        """tests the string method to make sure it returns
-            the proper string
-        """
-        my_str = str(self.temp_b)
-        id_test = "[BaseModel] ({})".format(self.temp_b.id)
-        boolean = id_test in my_str
-        self.assertEqual(True, boolean)
-        boolean = "updated_at" in my_str
-        self.assertEqual(True, boolean)
-        boolean = "created_at" in my_str
-        self.assertEqual(True, boolean)
-        boolean = "datetime.datetime" in my_str
-        self.assertEqual(True, boolean)
+    def test_updated_at_is_datetimeobj(self):
+        '''
+        tests if updated_at is a datetime object
+        '''
+        self.assertEqual(str(type(self.new_instance.updated_at)),
+                         "<class 'datetime.datetime'>")
 
-    def test_to_dict(self):
-        """tests the to_dict method to make sure properly working
-        """
-        my_dict = self.temp_b.to_dict()
-        self.assertEqual(str, type(my_dict['created_at']))
-        self.assertEqual(my_dict['created_at'],
-                         self.temp_b.created_at.isoformat())
-        self.assertEqual(datetime.datetime, type(self.temp_b.created_at))
-        self.assertEqual(my_dict['__class__'],
-                         self.temp_b.__class__.__name__)
-        self.assertEqual(my_dict['id'], self.temp_b.id)
+    def test_to_dict_type(self):
+        '''
+        test type of to_dict method
+        '''
+        basemodel_dict = self.new_instance.to_dict()
+        self.assertEqual(str(type(basemodel_dict)), "<class 'dict'>")
 
-    def test_to_dict_more(self):
-        """tests more things with to_dict method
-        """
-        my_dict = self.temp_b.to_dict()
-        created_at = my_dict['created_at']
-        time = datetime.datetime.strptime(created_at, "%Y-%m-%dT%H:%M:%S.%f")
-        self.assertEqual(self.temp_b.created_at, time)
+    def test_to_dict_created_at(self):
+        '''
+        test to_dict created_at type
+        '''
+        new_dict = self.new_instance.to_dict()
+        self.assertEqual(str(type(new_dict["created_at"])), "<class 'str'>")
 
-    def test_from_dict_basic(self):
-        """tests the from_dict method
-        """
-        my_dict = self.temp_b.to_dict()
-        my_base = BaseModel(**my_dict)
-        self.assertEqual(my_base.id, self.temp_b.id)
-        self.assertEqual(my_base.updated_at, self.temp_b.updated_at)
-        self.assertEqual(my_base.created_at, self.temp_b.created_at)
-        self.assertEqual(my_base.__class__.__name__,
-                         self.temp_b.__class__.__name__)
+    def test_to_dict_updated_at(self):
+        '''
+        test to_dict updated_at type
+        '''
+        new_dict = self.new_instance.to_dict()
+        self.assertEqual(str(type(new_dict["updated_at"])), "<class 'str'>")
 
-    def test_from_dict_hard(self):
-        """test for the from_dict method for basemodel objects
-        """
-        self.temp_b.random = "hello!"
-        self.temp_b.z = 55
-        my_dict = self.temp_b.to_dict()
-        self.assertEqual(my_dict['z'], 55)
-        my_base = BaseModel(**my_dict)
-        self.assertEqual(my_base.z, self.temp_b.z)
-        self.assertEqual(my_base.random, self.temp_b.random)
-        self.assertEqual(my_base.created_at, self.temp_b.created_at)
+    def test_to_dict_classKey(self):
+        '''
+        checks if key class exists in the dict
+        '''
+        new_dict = self.new_instance.to_dict()
+        self.assertEqual(new_dict["__class__"], "BaseModel")
 
-    def test_unique_id(self):
-        """test for unique ids for basemodel objects
-        """
-        another = BaseModel()
-        another2 = BaseModel()
-        self.assertNotEqual(self.temp_b.id, another.id)
-        self.assertNotEqual(self.temp_b.id, another2.id)
+    def test_save(self):
+        '''
+        tests created_at and updated_at values after call to save
+        '''
+        first_dict = self.new_instance.to_dict()
+        self.new_instance.save()
+        second_dict = self.new_instance.to_dict()
+        self.assertEqual(first_dict["created_at"], second_dict["created_at"])
+        self.assertNotEqual(
+            first_dict["updated_at"], second_dict["updated_at"])
 
-    def test_id_type_string(self):
-        """test id of the basemodel is a string
-        """
-        self.assertEqual(type(self.temp_b.id), str)
+    def test_kwargs_id(self):
+        '''
+        tests if id stays the same during serialization - deserialization
+        process
+        '''
+        first_inst = self.new_instance
+        new_dict = first_inst.to_dict()
+        second_inst = BaseModel(**new_dict)
+        self.assertEqual(first_inst.id, second_inst.id)
 
-    def test_updated_time(self):
-        """test that updated time gets updated
-        """
-        time1 = self.temp_b.updated_at
-        self.temp_b.save()
-        time2 = self.temp_b.updated_at
-        self.assertNotEqual(time1, time2)
-        self.assertEqual(type(time1), datetime.datetime)
+    def test_args(self):
+        '''
+        tests args
+        '''
+        new_instance = self.new_instance
+        new_instance.name = "Holberton"
+        self.assertEqual(new_instance.name, "Holberton")
