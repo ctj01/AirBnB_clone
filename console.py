@@ -1,7 +1,8 @@
 #!/usr/bin/python3
 """
- cmd
+ cmd implementation
 """
+
 
 from models.base_model import BaseModel
 import cmd
