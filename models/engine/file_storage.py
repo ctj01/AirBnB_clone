@@ -3,6 +3,7 @@
 Base model class definition
 """
 
+
 from models.base_model import BaseModel
 import json
 

@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+
 """
 Base model class definition
 """
