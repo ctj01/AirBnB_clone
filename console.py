@@ -8,6 +8,7 @@ import cmd
 import sys
 import os
 
+
 class HBNBCommand(cmd.Cmd):
     """
     hbm implementation
@@ -16,17 +17,21 @@ class HBNBCommand(cmd.Cmd):
     """
     Models = {"BaseModel": BaseModel}
     prompt = "(hbnb) "
+
     def do_EOF(self, arg):
         """ Exit method for EOF """
         print('')
         exit()
+
     def do_help(self, args):
         """Get help on commands
         """
         cmd.Cmd.do_help(self, args)
+
     def do_quit(self, arg):
         """ Exit method """
         exit()
+
     def do_create(self, args):
         """[summary]
 
@@ -49,5 +54,7 @@ class HBNBCommand(cmd.Cmd):
             arg ([type]): [description]
         """
         print(arg.split(" "))
+
+
 if __name__ == '__main__':
     HBNBCommand().cmdloop()
