@@ -37,9 +37,13 @@ class BaseModel:
         constructor
         """
         if kwargs:
+            kwargs['created_at'] = datetime.strptime(kwargs['created_at'],
+                                                     '%Y-%m-%dT%H:%M:%S.%f')
+            kwargs['updated_at'] = datetime.strptime(kwargs['updated_at'],
+                                                     '%Y-%m-%dT%H:%M:%S.%f')
             for key, value in kwargs.items():
-                if key != "__class__":
-                    setattr(self, key, cast_datetime(key, value))
+                if key != '__class__':
+                    setattr(self, key, value)
         else:
             self.id = str(uuid.uuid4())
             self.created_at = datetime.now()
